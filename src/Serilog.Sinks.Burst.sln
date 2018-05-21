@@ -7,7 +7,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serilog.Sinks.Burst", "Seri
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serilog.Sinks.Burst.Tests", "Serilog.Sinks.Burst.Tests\Serilog.Sinks.Burst.Tests.csproj", "{8150F2DF-2201-4FF8-B31D-0B3E108F91AF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serilog.Sinks.Burst.Sample", "Serilog.Sinks.Burst.Sample\Serilog.Sinks.Burst.Sample.csproj", "{C2D7261A-E316-4DB5-BFD0-A67D819E43A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Serilog.Sinks.Burst.Sample", "Serilog.Sinks.Burst.Sample\Serilog.Sinks.Burst.Sample.csproj", "{C2D7261A-E316-4DB5-BFD0-A67D819E43A9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{CAC0376E-6228-4B8C-8163-2D3B1BEDED07}"
+	ProjectSection(SolutionItems) = preProject
+		..\build.cake = ..\build.cake
+		..\build.ps1 = ..\build.ps1
+		..\build.sh = ..\build.sh
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C5F302E0-F17A-45DF-BF61-16B23EF3DC21}"
+	ProjectSection(SolutionItems) = preProject
+		..\README.md = ..\README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

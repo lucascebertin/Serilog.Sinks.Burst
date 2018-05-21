@@ -38,7 +38,7 @@ namespace Serilog.Sinks.Burst.Tests
         }
 
         [Fact(DisplayName = "Callback should invoked 20 times even with concurrency over it")]
-        public void Callback_should_invoked_20_times_even_with_concurrency_over_it()
+        public async Task Callback_should_invoked_20_times_even_with_concurrency_over_it()
         {
             var fn = A.Fake<Action<IEnumerable<string>>>();
             
@@ -50,7 +50,7 @@ namespace Serilog.Sinks.Burst.Tests
             Action act = () =>
                 Enumerable.Range(0, 100).ToList().ForEach(x => burst.Add($"{x}"));
 
-            Task.WaitAll(Task.Run(act), Task.Run(act));
+            await Task.WhenAll(Task.Run(act), Task.Run(act));
 
             A.CallTo(fn).MustHaveHappened(20, Times.Exactly);
         }

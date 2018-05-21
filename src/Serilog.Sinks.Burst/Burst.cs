@@ -8,7 +8,7 @@ using Timer = System.Timers.Timer;
 
 namespace Serilog.Sinks.Burst
 {
-    public class Burst<T>
+    public class Burst<T> : IDisposable
     {
         private readonly int _limit;
         private readonly Action<IEnumerable<T>> _fn;
@@ -192,6 +192,12 @@ namespace Serilog.Sinks.Burst
             }
 
             return (canKeepDequeuing, items);
+        }
+
+        public void Dispose()
+        {
+            _semaphoreSlim?.Dispose();
+            _timer?.Dispose();
         }
     }
 }

@@ -1,7 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Description>A Serilog sink that flushes logs on batches or based on a timer.</Description>
+
+    <Authors>Lucas Cé Bertin</Authors>
+    <PackageId>Serilog.Sinks.Burst</PackageId>
+    <PackageTags>serilog;sinks;burst;batch;timer</PackageTags>
+    <PackageIconUrl>http://serilog.net/images/serilog-sink-nuget.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/lucascebertin/Serilog.Sinks.Burst</PackageProjectUrl>
+    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+  
     <TargetFramework>netstandard2.0</TargetFramework>
+	<Version>1.0.0</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Serilog" Version="2.7.1" />
+  </ItemGroup>
 
 </Project>

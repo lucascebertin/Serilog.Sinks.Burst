@@ -3,6 +3,9 @@
 This project helps on timed/batching log dispatch.
 It's a netstandard2 library to provide a clean way to send Serilog events based on a batch limit and/or time interval.
 
+[![Linux Build][travis-image]][travis-url]
+[![Windows Build][appveyor-image]][appveyor-url]
+
 ## Gettins started
 
 ### Prerequisites
@@ -59,3 +62,9 @@ public static class LoggerConfigurationYourSinkExtensions
 
 ## IMPORTANT NOTES!
 This repository and package are in early stages, so, use it on your own and risk but feel free to contribute opening issues or sending pull-requests!
+
+[travis-image]: https://img.shields.io/travis/lucascebertin/Serilog.Sinks.Burst/master.svg?label=linux
+[travis-url]: https://travis-ci.org/lucascebertin/Serilog.Sinks.Burst
+
+[appveyor-image]: https://ci.appveyor.com/api/projects/status/0imo52uvl8c6eval?svg=true
+[appveyor-url]: https://ci.appveyor.com/project/lcssk8board/serilog-sinks-burst

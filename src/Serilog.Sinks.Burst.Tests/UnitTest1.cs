@@ -6,11 +6,16 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Serilog.Sinks.Burst.Tests
 {
     public class UnitTest1
     {
+        private readonly ITestOutputHelper _output;
+        public UnitTest1(ITestOutputHelper output) =>
+            _output = output;
+
         [Fact(DisplayName = "Callback should be invoked 2 times and passed all the amount of data when configured with batch limit")]
         public void Should_be_invoked_two_times_and_passed_all_the_amount_of_data_when_configured_with_batch_limit()
         {
@@ -21,7 +26,7 @@ namespace Serilog.Sinks.Burst.Tests
             var fn = A.Fake<Action<IEnumerable<string>>>();
             var expectedObjects = new List<string>(amountOfData);
 
-            A.CallTo(fn).Invokes((IEnumerable<string> x) => 
+            A.CallTo(fn).Invokes((IEnumerable<string> x) =>
                 expectedObjects.AddRange(x));
 
             var burst = new BurstBuilder<string>()
@@ -38,22 +43,35 @@ namespace Serilog.Sinks.Burst.Tests
         }
 
         [Fact(DisplayName = "Callback should invoked 20 times even with concurrency over it")]
-        public async Task Callback_should_invoked_20_times_even_with_concurrency_over_it()
+        public void Callback_should_invoked_20_times_even_with_concurrency_over_it()
         {
-            var fn = A.Fake<Action<IEnumerable<string>>>();
-            
+            var counter = 0;
+
+            async Task Fn(IEnumerable<string> x)
+            {
+                _output.WriteLine(string.Join(",", x));
+                Interlocked.Increment(ref counter);
+                await Task.FromResult(0);
+            }
+
             var burst = new BurstBuilder<string>()
                 .AddBatchLimit(10)
-                .AddCallback(fn)
+                .AddCallback(Fn)
+                .AddTimer(500000)
                 .CreateBurst();
 
-            Action act = () =>
-                Enumerable.Range(0, 100).ToList().ForEach(x => burst.Add($"{x}"));
+            IEnumerable<Task> TaskGen() =>
+                Enumerable.Range(0, 100)
+                .ToList()
+                .Select(x => burst.AddAsync($"{x}"));
 
-            await Task.WhenAll(Task.Run(act), Task.Run(act));
+            var tasks = new List<Task>();
+            tasks.AddRange(TaskGen());
+            tasks.AddRange(TaskGen());
 
-            A.CallTo(fn).MustHaveHappened(20, Times.Exactly);
-        }
+            Task.WaitAll(tasks.ToArray());
+
+            counter.Should().Be(20);        }
 
         [Fact(DisplayName = "Callback should be invoked after some time when not added the minimum amount of data and with a timer configured")]
         public void Callback_should_be_invoked_after_some_time_when_not_added_the_minimum_amount_of_data_and_with_a_timer_configured()
@@ -77,7 +95,7 @@ namespace Serilog.Sinks.Burst.Tests
             A.CallTo(fn).MustHaveHappened(2, Times.Exactly);
         }
 
-        
+
         [Fact(DisplayName = "Callback should be invoked asynchronously after some time when not added the minimum amount of data and with a timer configured")]
         public async Task Callback_should_be_invoked_asynchronously_after_some_time_when_not_added_the_minimum_amount_of_data_and_with_a_timer_configured()
         {

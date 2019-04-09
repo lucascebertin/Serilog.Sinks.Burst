@@ -6,7 +6,7 @@ var target = Argument("Target", "Default");
 var configuration = Argument("Configuration", "Release");
 var source = Argument("source", "https://api.nuget.org/v3/index.json");
 var apiKey = Argument<string>("apikey", null);
-var version = Argument("version", "1.0.0");
+var version = Argument("version", "1.0.1");
 
 Information($"Running target {target} in configuration {configuration}");
 
@@ -33,12 +33,13 @@ Task("Restore")
  Task("Build")
     .Does(() =>
     {
-        DotNetCoreBuild(solutionPath,
-            new DotNetCoreBuildSettings()
-            {
-                Configuration = configuration,
-                ArgumentCustomization = args => args.Append("--no-restore"),
-            });
+		MSBuild(solutionPath, new MSBuildSettings {
+				Verbosity = Verbosity.Minimal,
+				ToolVersion = MSBuildToolVersion.VS2017,
+				Restore = true,
+				Configuration = configuration,
+				PlatformTarget = PlatformTarget.MSIL
+			});
     });
 
 // Look under a 'Tests' folder and run dotnet test against all of those projects.
@@ -63,35 +64,123 @@ Task("Test")
 
 // Publish the app to the /dist folder
 Task("Publish")
+    .IsDependentOn("Clean")
+    .IsDependentOn("Update-Version")
     .Does(() =>
     {
-        DotNetCorePublish(
-            solutionPath,
-            new DotNetCorePublishSettings()
-            {
-                Configuration = configuration,
-                OutputDirectory = build,
-                ArgumentCustomization = args => args.Append("--no-restore"),
-            });
+		 var projects = GetFiles("./src/Serilog.Sinks.Burst/*.csproj");
+		 foreach(var project in projects)
+		 {
+			 Information("Publishing project: {0}", project);
+
+			 // .NET 4.5.2
+			DotNetCorePublish(
+				project.FullPath,
+				new DotNetCorePublishSettings()
+				{
+					Configuration = configuration,
+					Framework = "net452",
+					OutputDirectory = build.ToString() + "/lib/net452",
+					ArgumentCustomization = args => args.Append("--no-restore"),
+				});
+
+
+			// .NET 4.6.1
+			DotNetCorePublish(
+				project.FullPath,
+				new DotNetCorePublishSettings()
+				{
+					Configuration = configuration,
+					Framework = "net461",
+					OutputDirectory = build.ToString() + "/lib/net461",
+					ArgumentCustomization = args => args.Append("--no-restore"),
+				});
+
+
+
+			// .NET Standard 2.0
+			DotNetCorePublish(
+				project.FullPath,
+				new DotNetCorePublishSettings()
+				{
+					Configuration = configuration,
+					Framework = "netstandard2.0",
+					OutputDirectory = build.ToString() + "/lib/netstandard2.0",
+					ArgumentCustomization = args => args.Append("--no-restore"),
+				});
+
+			}
     });
 
 Task("Package-NuGet")
-    .IsDependentOn("Update-Version")
+    .IsDependentOn("Publish")
     .Description("Generates NuGet packages for each project")
     .Does(() =>
     {
-        foreach(var project in GetFiles("./src/Serilog.Sinks.Burst/*.csproj"))
-        {
-            Information("Packaging " + project.GetFilename().FullPath);
+		 
+		 if ( !DirectoryExists(nuget) )
+		 {
+			CreateDirectory(nuget);
+		 }
 
-            var content =
-                System.IO.File.ReadAllText(project.FullPath, Encoding.UTF8);
+	     var nuGetPackSettings   = new NuGetPackSettings {
+                                     Id                      = "Serilog.Sinks.Burst",
+                                     Version                 =  version,
+                                     RequireLicenseAcceptance= false,
+                                     Symbols                 = false,
+                                     NoPackageAnalysis       = true,
+                                     Files                   = new [] {
+                                            new NuSpecContent {Source = "**", Target = "."},
+																	   },	
+									Dependencies			 = new [] {
+											// .NETFramework4.5.2
+											new NuSpecDependency 
+											{
+												Id = "Serilog", 
+												TargetFramework="net452", 
+												Version="2.8.0"
+											},
+											new NuSpecDependency 
+											{
+												Id = "System.ValueTuple", 
+												TargetFramework="net452", 
+												Version="4.5.0"
+											},
 
-			DotNetCorePack(project.GetDirectory().FullPath, new DotNetCorePackSettings {
-                Configuration = configuration,
-                OutputDirectory = nuget
-            });
-        }
+											// .NETFramework4.6.1
+											new NuSpecDependency 
+											{
+												Id = "Serilog", 
+												TargetFramework="net461", 
+												Version="2.8.0"
+											},
+											new NuSpecDependency 
+											{
+												Id = "System.ValueTuple", 
+												TargetFramework="net461", 
+												Version="4.5.0"
+											},
+
+											// .NETStandard2.0
+											new NuSpecDependency 
+											{
+												Id = "Serilog", 
+												TargetFramework="netstandard2.0", 
+												Version="2.8.0"
+											},
+											new NuSpecDependency 
+											{
+												Id = "NETStandard.Library", 
+												TargetFramework="netstandard2.0", 
+												Version="2.0.3"
+											},
+										},
+                                     BasePath                = build,
+                                     OutputDirectory         = nuget
+                                 };
+
+			NuGetPack("Serilog.Sinks.Burst.nuspec", nuGetPackSettings);
+
     });
 
 Task("Publish-NuGet")
@@ -116,7 +205,6 @@ Task("Publish-NuGet")
     });
 
 Task("Update-Version")
-    .IsDependentOn("Build")
     .Does(() =>
     {
         Information("Setting version to " + version);

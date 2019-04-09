@@ -15,6 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Scripts", "Scripts", "{CAC0
 		..\build.cake = ..\build.cake
 		..\build.ps1 = ..\build.ps1
 		..\build.sh = ..\build.sh
+		..\Serilog.Sinks.Burst.nuspec = ..\Serilog.Sinks.Burst.nuspec
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C5F302E0-F17A-45DF-BF61-16B23EF3DC21}"

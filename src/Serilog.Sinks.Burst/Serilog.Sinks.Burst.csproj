@@ -10,10 +10,9 @@
     <PackageProjectUrl>https://github.com/lucascebertin/Serilog.Sinks.Burst</PackageProjectUrl>
     <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
 
-    <TargetFrameworks>net452;net461;netstandard2.0;netcoreapp2.1</TargetFrameworks>
-    <RuntimeIdentifiers>win-x86;win-x64;win-msil</RuntimeIdentifiers>
+    <TargetFrameworks>net452;net461;netstandard2.0</TargetFrameworks>
     <Version>1.0.1</Version>
-    <Platforms>AnyCPU;x64;x86</Platforms>
+    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

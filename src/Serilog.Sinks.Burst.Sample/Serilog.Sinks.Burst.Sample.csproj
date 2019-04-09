@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net452;net461;netstandard2.0;netcoreapp2.1</TargetFrameworks>
-    <Platforms>AnyCPU;x64;x86</Platforms>
+    <TargetFrameworks>net452;net461;netcoreapp2.1</TargetFrameworks>
+    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
   <ItemGroup>

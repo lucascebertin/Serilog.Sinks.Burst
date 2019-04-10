@@ -60,6 +60,14 @@ public static class LoggerConfigurationYourSinkExtensions
 }
 ```
 
+## Travis useful notes
+At the root you will find a Docker file named `Dockerfile.travis`.
+To simulate, run this way:
+```
+docker build -t travis-ci-burst -f Dockerfile.travis .
+docker run -it travis-ci-burst
+```
+
 ## IMPORTANT NOTES!
 This repository and package are in early stages, so, use it on your own and risk but feel free to contribute opening issues or sending pull-requests!
 

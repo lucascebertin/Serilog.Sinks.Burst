@@ -1,4 +1,5 @@
 // Target - The task you want to start. Runs the Default task if not specified.
+#tool "nuget:?package=xunit.runner.console"
 
 using System.Text.RegularExpressions;
 
@@ -47,18 +48,19 @@ Task("Restore")
 Task("Test")
     .Does(() =>
     {
+        XUnit2("./src/*Test*/bin/Release/net452/*.Tests.dll");
+        XUnit2("./src/*Test*/bin/Release/net461/*.Tests.dll");
+
         var projects = GetFiles("./src/*Test*/**/*.csproj");
         foreach(var project in projects)
         {
-            Information("Testing project " + project);
-            DotNetCoreTest(
-                project.ToString(),
-                new DotNetCoreTestSettings()
-                {
-                    Configuration = configuration,
-                    NoBuild = true,
-                    ArgumentCustomization = args => args.Append("--no-restore"),
-                });
+            DotNetCoreTest(project.ToString(), new DotNetCoreTestSettings()
+            {
+                Configuration = configuration,
+                Framework = "netcoreapp2.1",
+                NoBuild = true,
+                ArgumentCustomization = args => args.Append("--no-restore")
+            });
         }
     });
 
